@@ -1,10 +1,14 @@
 package com.example.a19osamn;
-import androidx.appcompat.app.AppCompatActivity;
-import android.annotation.SuppressLint;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.Menu;
+import android.webkit.WebView;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import android.annotation.SuppressLint;
+import android.os.AsyncTask;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -21,29 +25,66 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+
 public class MainActivity extends AppCompatActivity {
+    private WebView about;
 
     ArrayList<Cats> items;
     ArrayAdapter<Cats> adapter;
 
+
+    public void showabout() {
+
+        about.loadUrl("file:///android_asset/index.html");
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        about = findViewById(R.id.Aboutss);
+        //about.getSettings().setJavaScriptEnabled(true);
+
         items = new ArrayList<>();
         adapter = new ArrayAdapter<>(this,R.layout.list_item_textview,R.id.list_item_textview_xml, items);
         ListView list_view= findViewById(R.id.list_view);
         list_view.setAdapter(adapter);
+
+
+
         list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                String message = /*"The mountain" + items.get(i).getName() + " is located in " + items.get(i).getLocation()+*/ items.get(i).info() ;
+                String message = /*"The " + items.get(i).getName() + " is located in " + items.get(i).getLocation()+*/ items.get(i).info() ;
                 Toast.makeText(MainActivity.this,message,Toast.LENGTH_SHORT).show();
             }
         });
 
         new JsonTask().execute("https://wwwlab.iit.his.se/brom/kurser/mobilprog/dbservice/admin/getdataasjson.php?type=a19osamn");
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+    @Override
+
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.Aboutss) {
+            showabout();
+            Log.d("==>","Will display internal web page");
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
 
     @SuppressLint("StaticFieldLeak")
     private class JsonTask extends AsyncTask<String, String, String> {
@@ -96,9 +137,9 @@ public class MainActivity extends AppCompatActivity {
                     String n = jsonobjects.getString("name");
                     String l = jsonobjects.getString("location");
                     int h = jsonobjects.getInt("size");
-                    Cats NewCat = new Cats(n,l,h);
-                    items.add(NewCat);
-                    Log.d("SAM", NewCat.info());
+                    Cats nyttBerg = new Cats(n,l,h);
+                    items.add(nyttBerg);
+                    Log.d("SAM", nyttBerg.info());
                 }
                 adapter.notifyDataSetChanged();
             } catch (
@@ -107,4 +148,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
 }
